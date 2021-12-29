@@ -1,0 +1,6 @@
+main: com.github.g4memas0n.economies.Economies
+name: Economies
+version: 1.0.0-dev
+description: A plugin
+author: G4meMas0n
+api-version: 1.16
