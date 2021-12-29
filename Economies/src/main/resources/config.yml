@@ -1,0 +1,6 @@
+##################################################
+#     Economies - Plugin Configuration File      #
+##################################################
+
+# Sets whether the plugin should log debug information's to the console: (Type: Boolean, Default: false)
+debug: false
