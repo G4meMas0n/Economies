@@ -20,6 +20,8 @@ public final class Settings {
     private final Economies instance;
     private final YamlConfiguration storage;
 
+    private BigDecimal initial;
+
     private String bankName;
     private BigDecimal bankInitial;
     private boolean bankInfinite;
@@ -75,6 +77,7 @@ public final class Settings {
             this.instance.getLogger().info("Loaded default configuration from template: " + config.getName());
         }
 
+        this.initial = BigDecimal.valueOf(this._getInitialBalance());
         this.bankName = this._getBankName();
         this.bankInfinite = this._getBankInfinite();
         this.bankInitial = BigDecimal.valueOf(this._getBankInitial());
@@ -97,7 +100,23 @@ public final class Settings {
         return this.debug;
     }
 
-    public boolean _getBankInfinite() {
+    private long _getInitialBalance() {
+        final long initial = this.storage.getLong("balance.initial", 1000L);
+
+        if (initial <= 0) {
+            this.instance.getLogger().warning("Detected invalid initial balance: Value must be greater than zero");
+
+            return 1000L;
+        }
+
+        return initial;
+    }
+
+    public @NotNull BigDecimal getInitialBalance() {
+        return this.initial;
+    }
+
+    private boolean _getBankInfinite() {
         return this.storage.getBoolean("bank.infinite", true);
     }
 
@@ -105,7 +124,7 @@ public final class Settings {
         return this.bankInfinite;
     }
 
-    public long _getBankInitial() {
+    private long _getBankInitial() {
         final long initial = this.storage.getLong("bank.initial", 1000000000L);
 
         if (initial <= 0) {
@@ -121,7 +140,7 @@ public final class Settings {
         return this.bankInitial;
     }
 
-    public @NotNull String _getBankName() {
+    private @NotNull String _getBankName() {
         final String name = this.storage.getString("bank.name");
 
         if (name == null || name.isBlank()) {

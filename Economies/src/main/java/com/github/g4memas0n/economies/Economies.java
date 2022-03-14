@@ -1,6 +1,7 @@
 package com.github.g4memas0n.economies;
 
 import com.github.g4memas0n.economies.config.Settings;
+import com.github.g4memas0n.economies.storage.StorageManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,10 +13,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class Economies extends JavaPlugin {
 
+    private StorageManager storage;
     private Settings settings;
 
     private boolean loaded;
     private boolean enabled;
+
+    public @NotNull StorageManager getStorage() {
+        return this.storage;
+    }
 
     public @NotNull Settings getSettings() {
         return this.settings;
@@ -29,6 +35,7 @@ public final class Economies extends JavaPlugin {
         }
 
         this.settings = new Settings(this);
+        //TODO Create storage manager.
         this.settings.load();
         this.loaded = true;
     }
@@ -56,6 +63,7 @@ public final class Economies extends JavaPlugin {
         }
 
         this.settings = null;
+        this.storage = null;
         this.enabled = false;
         this.loaded = false;
     }

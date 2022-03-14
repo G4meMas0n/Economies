@@ -2,6 +2,13 @@
 #     Economies - Plugin Configuration File      #
 ##################################################
 
+# Sets various balance options for bank accounts.
+balance:
+
+  # Sets the initial balance of a bank account: (Type: Long, Default: 1000)
+  # Note: The value must be greater than zero. If it is not greater than zero, the default value will be used.
+  initial: 1000
+
 # Sets various options for the global bank account.
 bank:
 
