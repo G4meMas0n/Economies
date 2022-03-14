@@ -1,6 +1,6 @@
 package com.github.g4memas0n.economies.economy.account;
 
-import com.github.g4memas0n.economies.economy.storage.AccountStorage;
+import com.github.g4memas0n.economies.storage.AccountStorage;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
@@ -9,24 +9,32 @@ import java.util.concurrent.Future;
 
 public class PlayerAccount extends Account {
 
-    private final OfflinePlayer player;
+    private final OfflinePlayer base;
 
     public PlayerAccount(@NotNull final AccountStorage storage, @NotNull final OfflinePlayer player) {
         super(storage);
 
-        this.player = player;
+        this.base = player;
     }
 
     @Override
     public @NotNull Future<UUID> getUniqueId() {
-        return CompletableFuture.completedFuture(this.player.getUniqueId());
+        return CompletableFuture.completedFuture(this.base.getUniqueId());
     }
 
     @Override
     public @NotNull Future<String> getName() {
-        final String name = this.player.getName();
+        final String name = this.base.getName();
 
-        return name != null ? CompletableFuture.completedFuture(name) : super.getName();
+        if (name != null) {
+            if (this.base.isOnline() && this.base.getPlayer() != null) {
+                super.setName(this.base.getPlayer().getName());
+            }
+
+            return CompletableFuture.completedFuture(name);
+        }
+
+        return super.getName();
     }
 
     @Override

@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
 
 /**
  * The Settings class that represent the configuration file of this plugin.
@@ -18,6 +19,10 @@ public final class Settings {
 
     private final Economies instance;
     private final YamlConfiguration storage;
+
+    private String bankName;
+    private BigDecimal bankInitial;
+    private boolean bankInfinite;
 
     private boolean debug;
 
@@ -70,6 +75,10 @@ public final class Settings {
             this.instance.getLogger().info("Loaded default configuration from template: " + config.getName());
         }
 
+        this.bankName = this._getBankName();
+        this.bankInfinite = this._getBankInfinite();
+        this.bankInitial = BigDecimal.valueOf(this._getBankInitial());
+
         this.debug = this._getDebug();
     }
 
@@ -86,5 +95,45 @@ public final class Settings {
 
     public boolean isDebug() {
         return this.debug;
+    }
+
+    public boolean _getBankInfinite() {
+        return this.storage.getBoolean("bank.infinite", true);
+    }
+
+    public boolean isBankInfinite() {
+        return this.bankInfinite;
+    }
+
+    public long _getBankInitial() {
+        final long initial = this.storage.getLong("bank.initial", 1000000000L);
+
+        if (initial <= 0) {
+            this.instance.getLogger().warning("Detected invalid initial bank balance: Value must be greater than zero");
+
+            return 1000000000L;
+        }
+
+        return initial;
+    }
+
+    public @NotNull BigDecimal getBankInitial() {
+        return this.bankInitial;
+    }
+
+    public @NotNull String _getBankName() {
+        final String name = this.storage.getString("bank.name");
+
+        if (name == null || name.isBlank()) {
+            this.instance.getLogger().warning("Detected invalid bank name: Name is missing or is blank");
+
+            return "Bank";
+        }
+
+        return name;
+    }
+
+    public @NotNull String getBankName() {
+        return this.bankName;
     }
 }

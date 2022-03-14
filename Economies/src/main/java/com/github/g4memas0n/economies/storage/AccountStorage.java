@@ -1,4 +1,4 @@
-package com.github.g4memas0n.economies.economy.storage;
+package com.github.g4memas0n.economies.storage;
 
 import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;

@@ -2,5 +2,19 @@
 #     Economies - Plugin Configuration File      #
 ##################################################
 
+# Sets various options for the global bank account.
+bank:
+
+  # Sets whether the balance of global bank account is infinite: (Type: Boolean, Default: true)
+  # Note: When disabled, the money in circulation will always be the amount specified by 'bank.initial'.
+  infinite: true
+
+  # Sets the initial balance for the global bank account: (Type: Long, Default: 1000000000)
+  # Note: The value must be greater than zero. If it is not greater than zero, the default value will be used.
+  initial: 1000000000
+
+  # Sets the name of the global bank account: (Type: String, Default: "Bank")
+  name: "Bank"
+
 # Sets whether the plugin should log debug information's to the console: (Type: Boolean, Default: false)
 debug: false

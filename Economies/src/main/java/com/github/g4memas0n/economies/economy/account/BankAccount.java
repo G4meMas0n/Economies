@@ -1,6 +1,7 @@
 package com.github.g4memas0n.economies.economy.account;
 
-import com.github.g4memas0n.economies.economy.storage.AccountStorage;
+import com.github.g4memas0n.economies.Economies;
+import com.github.g4memas0n.economies.storage.AccountStorage;
 import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -10,8 +11,12 @@ public class BankAccount extends Account {
 
     public static final UUID UNIQUE_ID = new UUID(0L, 0L);
 
-    public BankAccount(@NotNull final AccountStorage storage) {
+    private final Economies instance;
+
+    public BankAccount(@NotNull final AccountStorage storage, @NotNull final Economies instance) {
         super(storage);
+
+        this.instance = instance;
     }
 
     @Override
@@ -21,7 +26,7 @@ public class BankAccount extends Account {
 
     @Override
     public @NotNull Future<String> getName() {
-        return CompletableFuture.completedFuture("Bank");
+        return CompletableFuture.completedFuture(this.instance.getSettings().getBankName());
     }
 
     @Override
@@ -31,7 +36,7 @@ public class BankAccount extends Account {
 
     @Override
     public @NotNull Future<Boolean> isInfinite() {
-        return CompletableFuture.completedFuture(false);
+        return CompletableFuture.completedFuture(this.instance.getSettings().isBankInfinite());
     }
 
     @Override
