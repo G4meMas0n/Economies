@@ -10,9 +10,11 @@ import java.util.function.Consumer;
 
 public abstract class Account {
 
+    protected final AccountProvider provider;
     protected final AccountStorage storage;
 
-    protected Account(@NotNull final AccountStorage storage) {
+    protected Account(@NotNull final AccountProvider provider, @NotNull final AccountStorage storage) {
+        this.provider = provider;
         this.storage = storage;
     }
 
@@ -214,6 +216,22 @@ public abstract class Account {
         return ((CompletableFuture<Boolean>) this.withdrawBalance(amount)).thenAccept(consumer);
     }
 
+    public @NotNull Future<Boolean> isCreditworthy() {
+        return this.storage.getCreditworthy();
+    }
+
+    public @NotNull Future<Void> isCreditworthy(@NotNull final Consumer<Boolean> consumer) {
+        return ((CompletableFuture<Boolean>) this.isCreditworthy()).thenAccept(consumer);
+    }
+
+    public @NotNull Future<Boolean> setCreditworthy(final boolean creditworthy) {
+        return this.storage.setCreditworthy(creditworthy);
+    }
+
+    public @NotNull Future<Void> setCreditworthy(final boolean creditworthy, @NotNull final Consumer<Boolean> consumer) {
+        return ((CompletableFuture<Boolean>) this.setCreditworthy(creditworthy)).thenAccept(consumer);
+    }
+
     /**
      * Checks whether the balance of this {@code Account} is infinite.
      * If the balance of this {@code Account} is infinite, then the result of the future
@@ -221,12 +239,7 @@ public abstract class Account {
      * @return a {@link Future} containing the result of this check.
      */
     public @NotNull Future<Boolean> isInfinite() {
-        final CompletableFuture<Boolean> future = this.storage.getInfinite();
-
-        return future.exceptionally(ex -> {
-            //TODO Log exception to console and inform player.
-            return false;
-        });
+        return CompletableFuture.completedFuture(false);
     }
 
     /**
@@ -238,28 +251,5 @@ public abstract class Account {
      */
     public @NotNull Future<Void> isInfinite(@NotNull final Consumer<Boolean> consumer) {
         return ((CompletableFuture<Boolean>) this.isInfinite()).thenAccept(consumer);
-    }
-
-    /**
-     * Updates whether the balance of this {@code Account} is infinite.
-     * If the update was successful, then the result of the future will be {@code true},
-     * otherwise it will be {@code false}.
-     * @param infinite whether the balance should be infinite.
-     * @return a {@link Future} containing the success of this update.
-     */
-    public @NotNull Future<Boolean> setInfinite(final boolean infinite) {
-        return this.storage.setInfinite(infinite);
-    }
-
-    /**
-     * Updates whether the balance of this {@code Account} is infinite.
-     * If the update was successful, then the input for the consumer will be {@code true},
-     * otherwise it will be {@code false}.
-     * @param infinite whether the balance should be infinite.
-     * @param consumer a {@link Consumer} accepting the success of this update.
-     * @return a {@link Future} that completes when the check is completed.
-     */
-    public @NotNull Future<Void> setInfinite(final boolean infinite, @NotNull final Consumer<Boolean> consumer) {
-        return this.storage.setInfinite(infinite).thenAccept(consumer);
     }
 }

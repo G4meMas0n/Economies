@@ -11,8 +11,9 @@ public class PlayerAccount extends Account {
 
     private final OfflinePlayer base;
 
-    public PlayerAccount(@NotNull final AccountStorage storage, @NotNull final OfflinePlayer player) {
-        super(storage);
+    public PlayerAccount(@NotNull final AccountProvider provider, @NotNull final AccountStorage storage,
+                         @NotNull final OfflinePlayer player) {
+        super(provider, storage);
 
         this.base = player;
     }
@@ -39,6 +40,23 @@ public class PlayerAccount extends Account {
 
     @Override
     public @NotNull Future<Boolean> setName(@NotNull final String name) {
+        return CompletableFuture.completedFuture(false);
+    }
+
+    @Override
+    public @NotNull Future<Boolean> isCreditworthy() {
+        if (this.base.isOnline() && this.base.getPlayer() != null) {
+            final boolean creditworthy = this.base.getPlayer().hasPermission("economies.creditworthy");
+
+            super.setCreditworthy(creditworthy);
+            return CompletableFuture.completedFuture(creditworthy);
+        }
+
+        return super.isCreditworthy();
+    }
+
+    @Override
+    public @NotNull Future<Boolean> setCreditworthy(final boolean creditworthy) {
         return CompletableFuture.completedFuture(false);
     }
 }

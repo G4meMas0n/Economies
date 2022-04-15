@@ -13,8 +13,9 @@ public class BankAccount extends Account {
 
     private final Economies instance;
 
-    public BankAccount(@NotNull final AccountStorage storage, @NotNull final Economies instance) {
-        super(storage);
+    public BankAccount(@NotNull final AccountProvider provider, @NotNull final AccountStorage storage,
+                       @NotNull final Economies instance) {
+        super(provider, storage);
 
         this.instance = instance;
     }
@@ -34,13 +35,16 @@ public class BankAccount extends Account {
         return CompletableFuture.completedFuture(false);
     }
 
-    @Override
-    public @NotNull Future<Boolean> isInfinite() {
-        return CompletableFuture.completedFuture(this.instance.getSettings().isBankInfinite());
+    public @NotNull Future<Boolean> isCreditworthy() {
+        return CompletableFuture.completedFuture(true);
+    }
+
+    public @NotNull Future<Boolean> setCreditworthy(final boolean creditworthy) {
+        return CompletableFuture.completedFuture(false);
     }
 
     @Override
-    public @NotNull Future<Boolean> setInfinite(final boolean infinite) {
-        return CompletableFuture.completedFuture(false);
+    public @NotNull Future<Boolean> isInfinite() {
+        return CompletableFuture.completedFuture(this.instance.getSettings().isBankInfinite());
     }
 }

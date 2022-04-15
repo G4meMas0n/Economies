@@ -23,7 +23,10 @@ public interface AccountStorage {
 
     @NotNull CompletableFuture<Boolean> subtractBalance(@NotNull final BigDecimal amount);
 
-    @NotNull CompletableFuture<Boolean> getInfinite();
+    @NotNull CompletableFuture<Boolean> transferBalance(@NotNull final AccountStorage other,
+                                                        @NotNull final BigDecimal amount);
 
-    @NotNull CompletableFuture<Boolean> setInfinite(final boolean infinite);
+    @NotNull CompletableFuture<Boolean> getCreditworthy();
+
+    @NotNull CompletableFuture<Boolean> setCreditworthy(final boolean creditworthy);
 }
