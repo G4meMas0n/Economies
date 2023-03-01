@@ -1,32 +1,39 @@
 package com.github.g4memas0n.economies.storage;
 
+import com.github.g4memas0n.economies.util.Response;
 import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public interface AccountStorage {
 
-    @NotNull CompletableFuture<UUID> getUniqueId();
+    @NotNull Response<UUID> getUniqueId();
 
-    @NotNull CompletableFuture<Boolean> setUniqueId(@NotNull final UUID uniqueId);
+    @NotNull Response<Boolean> setUniqueId(@NotNull final UUID uniqueId);
 
-    @NotNull CompletableFuture<String> getName();
+    @NotNull Response<String> getName();
 
-    @NotNull CompletableFuture<Boolean> setName(@NotNull final String name);
+    @NotNull Response<Boolean> setName(@NotNull final String name);
 
-    @NotNull CompletableFuture<BigDecimal> getBalance();
+    @NotNull Response<BigDecimal> getBalance();
 
-    @NotNull CompletableFuture<Boolean> setBalance(@NotNull final BigDecimal balance);
+    @NotNull Response<Boolean> setBalance(@NotNull final BigDecimal balance);
 
-    @NotNull CompletableFuture<Boolean> addBalance(@NotNull final BigDecimal amount);
+    @NotNull Response<Boolean> setBalance(@NotNull final BigDecimal balance,
+                                          @NotNull final Transaction transaction);
 
-    @NotNull CompletableFuture<Boolean> subtractBalance(@NotNull final BigDecimal amount);
+    @NotNull Response<Boolean> addBalance(@NotNull final BigDecimal amount);
 
-    @NotNull CompletableFuture<Boolean> transferBalance(@NotNull final AccountStorage other,
-                                                        @NotNull final BigDecimal amount);
+    @NotNull Response<Boolean> addBalance(@NotNull final BigDecimal amount,
+                                          @NotNull final Transaction transaction);
 
-    @NotNull CompletableFuture<Boolean> getCreditworthy();
+    @NotNull Response<Boolean> removeBalance(@NotNull final BigDecimal amount);
 
-    @NotNull CompletableFuture<Boolean> setCreditworthy(final boolean creditworthy);
+    @NotNull Response<Boolean> removeBalance(@NotNull final BigDecimal amount,
+                                             @NotNull final Transaction transaction);
+
+    @NotNull Response<Boolean> getCreditworthy();
+
+    @NotNull Response<Boolean> setCreditworthy(final boolean creditworthy);
+
 }

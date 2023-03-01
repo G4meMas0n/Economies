@@ -1,62 +1,55 @@
 package com.github.g4memas0n.economies.economy.account;
 
 import com.github.g4memas0n.economies.storage.AccountStorage;
+import com.github.g4memas0n.economies.util.Response;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
-public class PlayerAccount extends Account {
+public class PlayerAccount extends BasicAccount {
 
-    private final OfflinePlayer base;
+    private final OfflinePlayer player;
 
-    public PlayerAccount(@NotNull final AccountProvider provider, @NotNull final AccountStorage storage,
+    public PlayerAccount(@NotNull final AccountStorage storage,
                          @NotNull final OfflinePlayer player) {
-        super(provider, storage);
+        super(storage);
 
-        this.base = player;
+        this.player = player;
     }
 
     @Override
-    public @NotNull Future<UUID> getUniqueId() {
-        return CompletableFuture.completedFuture(this.base.getUniqueId());
+    public @NotNull Future<Response<UUID>> getUniqueId() {
+        return Response.future(player.getUniqueId());
     }
 
     @Override
-    public @NotNull Future<String> getName() {
-        final String name = this.base.getName();
+    public @NotNull Future<Response<String>> getName() {
+        final String name = this.player.getName();
 
-        if (name != null) {
-            if (this.base.isOnline() && this.base.getPlayer() != null) {
-                super.setName(this.base.getPlayer().getName());
-            }
-
-            return CompletableFuture.completedFuture(name);
-        }
-
-        return super.getName();
+        return name != null ? Response.future(name) : super.getName();
     }
 
     @Override
-    public @NotNull Future<Boolean> setName(@NotNull final String name) {
-        return CompletableFuture.completedFuture(false);
+    public @NotNull Future<Response<Boolean>> setName(@NotNull final String name) {
+        //TODO replace exception
+        return Response.future(false, new IllegalArgumentException("not possible"));
     }
 
     @Override
-    public @NotNull Future<Boolean> isCreditworthy() {
-        if (this.base.isOnline() && this.base.getPlayer() != null) {
-            final boolean creditworthy = this.base.getPlayer().hasPermission("economies.creditworthy");
+    public @NotNull Future<Response<Boolean>> isCreditworthy() {
+        if (this.player.isOnline() && this.player.getPlayer() != null) {
+            //TODO Check permission
 
-            super.setCreditworthy(creditworthy);
-            return CompletableFuture.completedFuture(creditworthy);
+            return Response.future(false);
         }
 
         return super.isCreditworthy();
     }
 
     @Override
-    public @NotNull Future<Boolean> setCreditworthy(final boolean creditworthy) {
-        return CompletableFuture.completedFuture(false);
+    public @NotNull Future<Response<Boolean>> setCreditworthy(final boolean creditworthy) {
+        //TODO replace exception
+        return Response.future(false, new IllegalArgumentException("not possible"));
     }
 }

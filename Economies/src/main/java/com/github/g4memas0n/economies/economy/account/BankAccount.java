@@ -1,50 +1,40 @@
 package com.github.g4memas0n.economies.economy.account;
 
-import com.github.g4memas0n.economies.Economies;
 import com.github.g4memas0n.economies.storage.AccountStorage;
+import com.github.g4memas0n.economies.util.Response;
 import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
-public class BankAccount extends Account {
+public class BankAccount extends BasicAccount {
 
-    public static final UUID UNIQUE_ID = new UUID(0L, 0L);
-
-    private final Economies instance;
-
-    public BankAccount(@NotNull final AccountProvider provider, @NotNull final AccountStorage storage,
-                       @NotNull final Economies instance) {
-        super(provider, storage);
-
-        this.instance = instance;
+    public BankAccount(@NotNull final AccountStorage storage) {
+        super(storage);
     }
 
     @Override
-    public @NotNull Future<UUID> getUniqueId() {
-        return CompletableFuture.completedFuture(UNIQUE_ID);
+    public @NotNull Future<Response<UUID>> getUniqueId() {
+        return Response.future(UUID.randomUUID());
     }
 
     @Override
-    public @NotNull Future<String> getName() {
-        return CompletableFuture.completedFuture(this.instance.getSettings().getBankName());
+    public @NotNull Future<Response<String>> getName() {
+        return Response.future("Bank"); //TODO replace bank name
     }
 
     @Override
-    public @NotNull Future<Boolean> setName(@NotNull final String name) {
-        return CompletableFuture.completedFuture(false);
-    }
-
-    public @NotNull Future<Boolean> isCreditworthy() {
-        return CompletableFuture.completedFuture(true);
-    }
-
-    public @NotNull Future<Boolean> setCreditworthy(final boolean creditworthy) {
-        return CompletableFuture.completedFuture(false);
+    public @NotNull Future<Response<Boolean>> setName(@NotNull final String name) {
+        //TODO replace exception
+        return Response.future(false, new IllegalArgumentException("not possible"));
     }
 
     @Override
-    public @NotNull Future<Boolean> isInfinite() {
-        return CompletableFuture.completedFuture(this.instance.getSettings().isBankInfinite());
+    public @NotNull Future<Response<Boolean>> isCreditworthy() {
+        return Response.future(true);
+    }
+
+    @Override
+    public @NotNull Future<Response<Boolean>> setCreditworthy(final boolean creditworthy) {
+        return Response.future(false);
     }
 }

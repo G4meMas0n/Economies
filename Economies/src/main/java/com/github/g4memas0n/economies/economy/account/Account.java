@@ -1,255 +1,211 @@
 package com.github.g4memas0n.economies.economy.account;
 
-import com.github.g4memas0n.economies.storage.AccountStorage;
+import com.github.g4memas0n.economies.util.Response;
 import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
-public abstract class Account {
-
-    protected final AccountProvider provider;
-    protected final AccountStorage storage;
-
-    protected Account(@NotNull final AccountProvider provider, @NotNull final AccountStorage storage) {
-        this.provider = provider;
-        this.storage = storage;
-    }
+public interface Account {
 
     /**
      * Requests the unique-id of this {@code Account}.
-     * The result of the {@link Future} may be null if it fails to retrieve the unique-id.
-     * @return a {@link Future} containing the unique-id after the retrieval.
+     * The response contains the requested unique-id if the action was successful. Otherwise, it will contain the
+     * throwable of the failure. //TODO List throwable
+     * @return a {@link Future} containing the response of this action.
      */
-    public @NotNull Future<UUID> getUniqueId() {
-        final CompletableFuture<UUID> future = this.storage.getUniqueId();
-
-        return future.exceptionally(ex -> {
-            //TODO Log exception to console and inform player.
-            return null;
-        });
-    }
+    @NotNull Future<Response<UUID>> getUniqueId();
 
     /**
      * Requests the unique-id of this {@code Account}.
-     * The input for the given {@link Consumer} may be null if it fails to retrieve the unique-id.
-     * @param consumer a {@link Consumer} accepting the retrieved unique-id.
-     * @return a {@link Future} that completes when the retrieval is completed.
+     * @param consumer a {@link Consumer} accepting the response of the action.
+     * @return a {@link Future} that completes when the consumer completes.
+     * @see #getUniqueId()
      */
-    public @NotNull Future<Void> getUniqueId(@NotNull final Consumer<UUID> consumer) {
-        return ((CompletableFuture<UUID>) this.getUniqueId()).thenAccept(consumer);
-    }
+    @NotNull Future<Void> getUniqueId(@NotNull final Consumer<Response<UUID>> consumer);
 
     /**
      * Requests the name of this {@code Account}.
-     * The result of the {@link Future} may be null if it fails to retrieve the name.
-     * @return a {@link Future} containing the name after the retrieval.
+     * The response contains the requested name if the action was successful. Otherwise, it will contain the
+     * throwable of the failure. //TODO List throwable
+     * @return a {@link Future} containing the response of this action.
      */
-    public @NotNull Future<String> getName() {
-        final CompletableFuture<String> future = this.storage.getName();
-
-        return future.exceptionally(ex -> {
-            //TODO Log exception to console and inform player.
-            return null;
-        });
-    }
+    @NotNull Future<Response<String>> getName();
 
     /**
      * Requests the name of this {@code Account}.
-     * The input for the given {@link Consumer} may be null if it fails to retrieve the name.
-     * @param consumer a {@link Consumer} accepting the retrieved name.
-     * @return a {@link Future} that completes when the retrieval is completed.
+     * @param consumer a {@link Consumer} accepting the response of the action.
+     * @return a {@link Future} that completes when the consumer completes.
+     * @see #getName()
      */
-    public @NotNull Future<Void> getName(@NotNull final Consumer<String> consumer) {
-        return ((CompletableFuture<String>) this.getName()).thenAccept(consumer);
-    }
+    @NotNull Future<Void> getName(@NotNull final Consumer<Response<String>> consumer);
 
     /**
-     * Sets the name of this {@code Account}.
-     * If this update was successful, then the result of the future will be {@code true},
-     * otherwise it will be {@code false}.
-     * @param name the new name that this {@code Account} should have.
-     * @return a {@link Future} containing the success of this update.
+     * Request the change of the name for this {@code Account}.
+     * The response contains whether the request was successful. Otherwise, it will contain the
+     * throwable of the failure. //TODO List throwable
+     * @param name the new name for this {@code Account}.
+     * @return a {@link Future} containing the response of this action.
      */
-    public @NotNull Future<Boolean> setName(@NotNull final String name) {
-        final CompletableFuture<Boolean> future = this.storage.setName(name);
-
-        return future.exceptionally(ex -> {
-            //TODO Log exception to console and inform player.
-            return false;
-        });
-    }
+    @NotNull Future<Response<Boolean>> setName(@NotNull final String name);
 
     /**
-     * Sets the name of this {@code Account}.
-     * If this update was successful, then the input for the consumer will be {@code true},
-     * otherwise it will be {@code false}.
-     * @param name the new name that this {@code Account} should have.
-     * @param consumer a {@link Consumer} accepting the success of this update.
-     * @return a {@link Future} that completes when the update is completed.
+     * Request the change of the name for this {@code Account}.
+     * @param name the new name for this {@code Account}.
+     * @param consumer a {@link Consumer} accepting the response of this action.
+     * @return a {@link Future} that completes when the consumer completes.
+     * @see #setName(String)
      */
-    public @NotNull Future<Void> setName(@NotNull final String name, @NotNull final Consumer<Boolean> consumer) {
-        return ((CompletableFuture<Boolean>) this.setName(name)).thenAccept(consumer);
-    }
+    @NotNull Future<Void> setName(@NotNull final String name, @NotNull final Consumer<Response<Boolean>> consumer);
 
     /**
      * Requests the current balance of this {@code Account}.
-     * The result of the {@link Future} may be null if it fails to retrieve the balance.
-     * @return a {@link Future} containing the balance after the retrieval.
+     * The response contains the current balance if the action was successful. Otherwise, it will contains the
+     * throwable of the failure. //TODO List throwable
+     * @return a {@link Future} containing the response of this action.
      */
-    public @NotNull Future<BigDecimal> getBalance() {
-        final CompletableFuture<BigDecimal> future = this.storage.getBalance();
-
-        return future.exceptionally(ex -> {
-            //TODO Log exception to console and inform player.
-            return null;
-        });
-    }
+    @NotNull Future<Response<BigDecimal>> getBalance();
 
     /**
      * Requests the current balance of this {@code Account}.
-     * The input for the given {@link Consumer} may be null if it fails to retrieve the balance.
-     * @param consumer a {@link Consumer} accepting the retrieved balance.
-     * @return a {@link Future} that completes when the retrieval is completed.
+     * @param consumer a {@link Consumer} accepting the response of this action.
+     * @return a {@link Future} that completes when the consumer completes.
+     * @see #getBalance()
      */
-    public @NotNull Future<Void> getBalance(@NotNull final Consumer<BigDecimal> consumer) {
-        return ((CompletableFuture<BigDecimal>) this.getBalance()).thenAccept(consumer);
-    }
+    @NotNull Future<Void> getBalance(@NotNull final Consumer<Response<BigDecimal>> consumer);
 
     /**
-     * Checks whether this {@code Account} has at least a balance of the given amount.
-     * If the balance of this {@code Account} meets or exceeds the specified amount, then the result of the future
-     * will be {@code true}, otherwise it will be {@code false}.
+     * Requests a balance check for this {@code Account}
+     * The result of the response will be {@code true} if this {@code Account} has at least the specified amount.
+     * Otherwise, it will be {@code false}. If the check fails, the response contains the throwable of the failure.
+     * //TODO List throwable
      * @param amount the amount that the balance must meet or exceed.
-     * @return a {@link Future} containing the result of this check.
+     * @return a {@link Future} containing the response for this check.
      */
-    public @NotNull Future<Boolean> hasBalance(@NotNull final BigDecimal amount) {
-        return this.storage.getBalance().thenApply(balance -> balance.compareTo(amount) >= 0);
-    }
+    @NotNull Future<Response<Boolean>> hasBalance(@NotNull final BigDecimal amount);
 
     /**
-     * Checks whether this {@code Account} has at least a balance of the given amount.
-     * If the balance of this {@code Account} meets or exceeds the specified amount, then the input for the consumer
-     * will be {@code true}, otherwise it will be {@code false}.
+     * Requests a balance check for this {@code Account}
      * @param amount the amount that the balance must meet or exceed.
-     * @param consumer a {@link Consumer} accepting the result of this check.
-     * @return a {@link Future} that completes when the check is completed.
+     * @param consumer a {@link Consumer} accepting the response of this check.
+     * @return a {@link Future} that completes when the consumer completes.
+     * @see #hasBalance(BigDecimal)
      */
-    public @NotNull Future<Void> hasBalance(@NotNull final BigDecimal amount, @NotNull final Consumer<Boolean> consumer) {
-        return ((CompletableFuture<Boolean>) this.hasBalance(amount)).thenAccept(consumer);
-    }
+    @NotNull Future<Void> hasBalance(@NotNull final BigDecimal amount,
+                                     @NotNull final Consumer<Response<Boolean>> consumer);
 
     /**
-     * Deposits the specified amount onto this {@code Account}.
-     * If the deposit was successful, then the result of the future will be {@code true},
-     * otherwise it will be {@code false}.
+     * Requests a deposit of the specified amount onto this {@code Account}.
+     * The response contains whether the request was successful. Otherwise, it will contain the
+     * throwable of the failure. //TODO List throwable
      * @param amount the amount that should be deposited.
-     * @return a {@link Future} containing the result of this deposit.
+     * @return a {@link Future} containing the response of this action.
      */
-    public @NotNull Future<Boolean> depositBalance(@NotNull final BigDecimal amount) {
-        //TODO Implement deposit balance handling.
-        return CompletableFuture.completedFuture(false);
-    }
+    @NotNull Future<Response<Boolean>> depositBalance(@NotNull final BigDecimal amount);
 
     /**
-     * Deposits the specified amount onto this {@code Account}.
-     * If the deposit was successful, then the input for the consumer will be {@code true},
-     * otherwise it will be {@code false}.
+     * Requests a deposit of the specified amount onto this {@code Account}.
      * @param amount the amount that should be deposited.
-     * @param consumer a {@link Consumer} accepting the result of this deposit.
-     * @return a {@link Future} that completes when the deposit is completed.
+     * @param consumer a {@link Consumer} accepting the response of this action.
+     * @return a {@link Future} that completes when the consumer completes.
+     * @see #depositBalance(BigDecimal)
      */
-    public @NotNull Future<Void> depositBalance(@NotNull final BigDecimal amount, @NotNull final Consumer<Boolean> consumer) {
-        return ((CompletableFuture<Boolean>) this.depositBalance(amount)).thenAccept(consumer);
-    }
+    @NotNull Future<Void> depositBalance(@NotNull final BigDecimal amount,
+                                         @NotNull final Consumer<Response<Boolean>> consumer);
 
     /**
-     * Transfers the specified amount from this {@code Account} onto the specified {@code Account}.
-     * If the transfer was successful, then the result of the future will be {@code true},
-     * otherwise it will be {@code false}.
+     * Requests a transfer of the specified amount from this {@code Account} onto the specified {@code Account}.
+     * The response contains whether the request was successful. Otherwise, it will contain the
+     * throwable of the failure. //TODO List throwable
+     * @param account the account that should receive the amount.
      * @param amount the amount that should be transferred.
      * @return a {@link Future} containing the result of this transfer.
      */
-    public @NotNull Future<Boolean> transferBalance(@NotNull final Account account, @NotNull final BigDecimal amount) {
-        return CompletableFuture.supplyAsync(() -> {
-            //TODO Implement transfer balance handling.
-            return false;
-        });
-    }
+    @NotNull Future<Response<Boolean>> transferBalance(@NotNull final Account account,
+                                                       @NotNull final BigDecimal amount);
 
     /**
-     * Transfers the specified amount from this {@code Account} onto the specified {@code Account}.
-     * If the transfer was successful, then the input for the consumer will be {@code true},
-     * otherwise it will be {@code false}.
+     * Requests a transfer of the specified amount from this {@code Account} onto the specified {@code Account}.
+     * @param account the account that should receive the amount.
      * @param amount the amount that should be transferred.
-     * @param consumer a {@link Consumer} accepting the result of this transfer.
-     * @return a {@link Future} that completes when the transfer is completed.
+     * @param consumer a {@link Consumer} accepting the response of this action.
+     * @return a {@link Future} that completes when the consumer completes.
+     * @see #transferBalance(Account, BigDecimal)
      */
-    public @NotNull Future<Void> transferBalance(@NotNull final Account account, @NotNull final BigDecimal amount,
-                                                 @NotNull final Consumer<Boolean> consumer) {
-        return ((CompletableFuture<Boolean>) this.transferBalance(account, amount)).thenAccept(consumer);
-    }
+    @NotNull Future<Void> transferBalance(@NotNull final Account account, @NotNull final BigDecimal amount,
+                                          @NotNull final Consumer<Response<Boolean>> consumer);
 
     /**
-     * Withdraws the specified amount from this {@code Account}.
-     * If the withdrawal was successful, then the result of the future will be {@code true},
-     * otherwise it will be {@code false}.
+     * Requests a withdrawal of the specified amount from this {@code Account}.
+     * The response contains whether the request was successful. Otherwise, it will contain the
+     * throwable of the failure. //TODO List throwable
      * @param amount the amount that should be withdrawn.
      * @return a {@link Future} containing the result of this withdrawal.
      */
-    public @NotNull Future<Boolean> withdrawBalance(@NotNull final BigDecimal amount) {
-        //TODO Implement withdraw balance handling.
-        return CompletableFuture.completedFuture(false);
-    }
+    @NotNull Future<Response<Boolean>> withdrawBalance(@NotNull final BigDecimal amount);
 
     /**
-     * Withdraws the specified amount from this {@code Account}.
-     * If the withdrawal was successful, then the input for the consumer will be {@code true},
-     * otherwise it will be {@code false}.
+     * Requests a withdrawal of the specified amount from this {@code Account}.
      * @param amount the amount that should be withdrawn.
-     * @param consumer a {@link Consumer} accepting the result of this withdrawal.
-     * @return a {@link Future} that completes when the withdrawal is completed.
+     * @param consumer a {@link Consumer} accepting the response of this action.
+     * @return a {@link Future} that completes when the consumer completes.
+     * @see #withdrawBalance(BigDecimal)
      */
-    public @NotNull Future<Void> withdrawBalance(@NotNull final BigDecimal amount, @NotNull final Consumer<Boolean> consumer) {
-        return ((CompletableFuture<Boolean>) this.withdrawBalance(amount)).thenAccept(consumer);
-    }
-
-    public @NotNull Future<Boolean> isCreditworthy() {
-        return this.storage.getCreditworthy();
-    }
-
-    public @NotNull Future<Void> isCreditworthy(@NotNull final Consumer<Boolean> consumer) {
-        return ((CompletableFuture<Boolean>) this.isCreditworthy()).thenAccept(consumer);
-    }
-
-    public @NotNull Future<Boolean> setCreditworthy(final boolean creditworthy) {
-        return this.storage.setCreditworthy(creditworthy);
-    }
-
-    public @NotNull Future<Void> setCreditworthy(final boolean creditworthy, @NotNull final Consumer<Boolean> consumer) {
-        return ((CompletableFuture<Boolean>) this.setCreditworthy(creditworthy)).thenAccept(consumer);
-    }
+    @NotNull Future<Void> withdrawBalance(@NotNull final BigDecimal amount,
+                                          @NotNull final Consumer<Response<Boolean>> consumer);
 
     /**
-     * Checks whether the balance of this {@code Account} is infinite.
-     * If the balance of this {@code Account} is infinite, then the result of the future
-     * will be {@code true}, otherwise it will be {@code false}.
-     * @return a {@link Future} containing the result of this check.
+     * Requests a check of the creditworthy for this {@code Account}.
+     * The result of the response will be {@code true} if this {@code Account} is creditworthy. Otherwise, it will
+     * be {@code false}. If the check fails, the response contains the throwable of the failure.
+     * //TODO List throwable
+     * @return a {@link Future} containing the response for this check.
      */
-    public @NotNull Future<Boolean> isInfinite() {
-        return CompletableFuture.completedFuture(false);
-    }
+    @NotNull Future<Response<Boolean>> isCreditworthy();
 
     /**
-     * Checks whether the balance of this {@code Account} is infinite.
-     * If the balance of this {@code Account} is infinite, then the input for the consumer
-     * will be {@code true}, otherwise it will be {@code false}.
-     * @param consumer a {@link Consumer} accepting the result of this check.
-     * @return a {@link Future} that completes when the check is completed.
+     * Requests a check of the creditworthy for this {@code Account}.
+     * @param consumer a {@link Consumer} accepting the response of this check.
+     * @return a {@link Future} that completes when the consumer completes.
+     * @see #isCreditworthy()
      */
-    public @NotNull Future<Void> isInfinite(@NotNull final Consumer<Boolean> consumer) {
-        return ((CompletableFuture<Boolean>) this.isInfinite()).thenAccept(consumer);
-    }
+    @NotNull Future<Void> isCreditworthy(@NotNull final Consumer<Response<Boolean>> consumer);
+
+    /**
+     * Requests a change of the creditworthy for this {@code Account}.
+     * The response contains whether the request was successful. Otherwise, it will contain the
+     * throwable of the failure. //TODO List throwable
+     * @param creditworthy whether this account is creditworthy or not.
+     * @return a {@link Future} containing the response of this action.
+     */
+    @NotNull Future<Response<Boolean>> setCreditworthy(final boolean creditworthy);
+
+    /**
+     * Requests a change of the creditworthy for this {@code Account}.
+     * @param creditworthy whether this account is creditworthy or not.
+     * @param consumer a {@link Consumer} accepting the response of this action.
+     * @return a {@link Future} that completes when the consumer completes.
+     * @see #setCreditworthy(boolean)
+     */
+    @NotNull Future<Void> setCreditworthy(final boolean creditworthy,
+                                          @NotNull final Consumer<Response<Boolean>> consumer);
+
+    /**
+     * Requests an infinity check for this {@code Account}.
+     * The result of the response will be {@code true} if this {@code Account} has an infinite balance. Otherwise, it
+     * will be {@code false}. If the check fails, the response contains the throwable of the failure.
+     * //TODO List throwable
+     * @return a {@link Future} containing the response of this check.
+     */
+    @NotNull Future<Response<Boolean>> isInfinite();
+
+    /**
+     * Requests an infinity check for this {@code Account}.
+     * @param consumer a {@link Consumer} accepting the response of this check.
+     * @return a {@link Future} that completes when the consumer completes.
+     * @see #isInfinite()
+     */
+    @NotNull Future<Void> isInfinite(@NotNull final Consumer<Response<Boolean>> consumer);
+
 }
