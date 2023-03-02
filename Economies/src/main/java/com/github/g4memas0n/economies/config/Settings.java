@@ -1,12 +1,13 @@
 package com.github.g4memas0n.economies.config;
 
+import com.github.g4memas0n.cores.bukkit.config.Configuration;
 import com.github.g4memas0n.economies.Economies;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 
 /**
@@ -17,142 +18,102 @@ import java.math.BigDecimal;
  */
 public final class Settings {
 
-    private final Economies instance;
-    private final YamlConfiguration storage;
+    private final YamlConfiguration defaults;
+    private final Configuration config;
 
     private BigDecimal initial;
-
-    private String bankName;
-    private BigDecimal bankInitial;
-    private boolean bankInfinite;
+    private BigDecimal minimum;
+    private BigDecimal maximum;
 
     private boolean debug;
 
-    public Settings(@NotNull final Economies instance) {
-        this.instance = instance;
-        this.storage = new YamlConfiguration();
+    public Settings(@NotNull final Economies plugin) {
+        this.config = new Configuration(plugin);
+        this.defaults = new YamlConfiguration();
     }
 
     public void load() {
-        final File config = new File(this.instance.getDataFolder(), "config.yml");
+        this.config.load();
 
         try {
-            this.storage.load(config);
+            final InputStream stream = this.config.getPlugin().getResource(this.config.getFilename());
 
-            this.instance.getLogger().info("Loaded configuration file: " + config.getName());
-        } catch (FileNotFoundException ex) {
-            this.instance.getLogger().warning("Unable to find configuration file: " + config.getName() + " (Saving default configuration...)");
-            this.instance.saveResource(config.getName(), true);
-            this.instance.getLogger().info("Saved default configuration from template: " + config.getName());
-
-            this.load();
-            return;
-        } catch (InvalidConfigurationException ex) {
-            this.instance.getLogger().warning("Unable to load broken configuration file: " + config.getName() + " (Renaming it and saving default configuration...)");
-
-            final File broken = new File(config.getParent(), config.getName().replaceAll("(?i)(yml)$", "broken.$1"));
-
-            if (broken.exists() && broken.delete()) {
-                this.instance.getLogger().info("Deleted old broken configuration file: " + broken.getName());
+            if (stream != null) {
+                this.defaults.load(new InputStreamReader(stream));
+                this.config.setDefaults(this.defaults);
             }
-
-            if (config.renameTo(broken)) {
-                this.instance.getLogger().info("Renamed broken configuration file to: " + broken.getName());
-            }
-
-            this.instance.saveResource(config.getName(), true);
-            this.instance.getLogger().info("Saved default configuration from template: " + config.getName());
-
-            this.load();
-            return;
-        } catch (IOException ex) {
-            this.instance.getLogger().warning("Unable to load configuration file: " + config.getName() + " (Loading default configuration...)");
-
-            /*
-             * Removing each key manual to clear existing configuration, as loading a blank config does not work here
-             * for any reason.
-             */
-            this.storage.getKeys(false).forEach(key -> this.storage.set(key, null));
-
-            this.instance.getLogger().info("Loaded default configuration from template: " + config.getName());
+        } catch (InvalidConfigurationException | IOException ex) {
+            Economies.warning("Unable to load default configuration '" + this.config.getFilename() + "': " + ex.getMessage());
         }
 
-        this.initial = BigDecimal.valueOf(this._getInitialBalance());
-        this.bankName = this._getBankName();
-        this.bankInfinite = this._getBankInfinite();
-        this.bankInitial = BigDecimal.valueOf(this._getBankInitial());
+        this.initial = loadInitialBalance();
+        this.minimum = loadMinimumBalance();
+        this.maximum = loadMaximumBalance();
 
-        this.debug = this._getDebug();
+        this.debug = loadDebug();
     }
 
-    @SuppressWarnings("unused")
     public void save() {
         /*
-         * Disabled, because it is not intended to save the config file, as this breaks the comments.
+         * Disabled, because it is not intended to save the config file, as this eventually breaks the comments.
          */
     }
 
-    private boolean _getDebug() {
-        return this.storage.getBoolean("debug", false);
-    }
 
-    public boolean isDebug() {
-        return this.debug;
-    }
+    private @NotNull BigDecimal loadInitialBalance() {
+        long amount = this.config.getLong("balance.initial");
 
-    private long _getInitialBalance() {
-        final long initial = this.storage.getLong("balance.initial", 1000L);
-
-        if (initial <= 0) {
-            this.instance.getLogger().warning("Detected invalid initial balance: Value must be greater than zero");
-
-            return 1000L;
+        if (amount < 0) {
+            Economies.warning("Found invalid initial balance: Value must be greater than or equal to zero");
+            amount = this.defaults.getLong("balance.initial");
         }
 
-        return initial;
+        return BigDecimal.valueOf(amount);
     }
 
     public @NotNull BigDecimal getInitialBalance() {
         return this.initial;
     }
 
-    private boolean _getBankInfinite() {
-        return this.storage.getBoolean("bank.infinite", true);
-    }
+    private @NotNull BigDecimal loadMinimumBalance() {
+        long amount = this.config.getLong("balance.minimum");
 
-    public boolean isBankInfinite() {
-        return this.bankInfinite;
-    }
-
-    private long _getBankInitial() {
-        final long initial = this.storage.getLong("bank.initial", 1000000000L);
-
-        if (initial <= 0) {
-            this.instance.getLogger().warning("Detected invalid initial bank balance: Value must be greater than zero");
-
-            return 1000000000L;
+        if (amount > 0) {
+            Economies.warning("Found invalid minimum balance: Value must be smaller than or equal to zero");
+            amount = this.defaults.getLong("balance.minimum");
         }
 
-        return initial;
+        return BigDecimal.valueOf(amount);
     }
 
-    public @NotNull BigDecimal getBankInitial() {
-        return this.bankInitial;
+    public @NotNull BigDecimal getMinimumBalance() {
+        return this.minimum;
     }
 
-    private @NotNull String _getBankName() {
-        final String name = this.storage.getString("bank.name");
+    public boolean hasMinimumBalance() {
+        return this.minimum.compareTo(BigDecimal.ZERO) < 0;
+    }
 
-        if (name == null || name.isBlank()) {
-            this.instance.getLogger().warning("Detected invalid bank name: Name is missing or is blank");
+    private @NotNull BigDecimal loadMaximumBalance() {
+        long amount = this.config.getLong("balance.maximum");
 
-            return "Bank";
+        if (amount <= 0 && amount != -1) {
+            Economies.warning("Found invalid maximum balance: Value must be greater than zero or negative one");
+            amount = this.defaults.getLong("balance.maximum");
         }
 
-        return name;
+        return BigDecimal.valueOf(amount);
     }
 
-    public @NotNull String getBankName() {
-        return this.bankName;
+    public @NotNull BigDecimal getMaximumBalance() {
+        return this.maximum;
+    }
+
+    private boolean loadDebug() {
+        return this.config.getBoolean("debug");
+    }
+
+    public boolean isDebug() {
+        return this.debug;
     }
 }

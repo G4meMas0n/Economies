@@ -16,6 +16,15 @@
 
     <name>Economies</name>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.github.G4meMas0n.Cores</groupId>
+            <artifactId>cores-bukkit</artifactId>
+            <version>1c7c535531</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
     <build>
         <directory>target</directory>
         <finalName>${project.name}-v${project.version}</finalName>
