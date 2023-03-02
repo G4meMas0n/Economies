@@ -1,39 +1,29 @@
 package com.github.g4memas0n.economies.storage;
 
-import com.github.g4memas0n.economies.util.Response;
 import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.util.UUID;
 
 public interface AccountStorage {
 
-    @NotNull Response<UUID> getUniqueId();
+    @NotNull UUID getUniqueId() throws StorageException;
 
-    @NotNull Response<Boolean> setUniqueId(@NotNull final UUID uniqueId);
+    @NotNull String getName() throws StorageException;
 
-    @NotNull Response<String> getName();
+    boolean setName(@NotNull final String name) throws StorageException;
 
-    @NotNull Response<Boolean> setName(@NotNull final String name);
+    @NotNull BigDecimal getBalance() throws StorageException;
 
-    @NotNull Response<BigDecimal> getBalance();
+    boolean setBalance(@NotNull final BigDecimal balance) throws StorageException;
 
-    @NotNull Response<Boolean> setBalance(@NotNull final BigDecimal balance);
+    boolean setBalance(@NotNull final BigDecimal balance, @NotNull final Transaction transaction)  throws StorageException;
 
-    @NotNull Response<Boolean> setBalance(@NotNull final BigDecimal balance,
-                                          @NotNull final Transaction transaction);
+    boolean addBalance(@NotNull final BigDecimal amount) throws StorageException;
 
-    @NotNull Response<Boolean> addBalance(@NotNull final BigDecimal amount);
+    boolean addBalance(@NotNull final BigDecimal amount, @NotNull final Transaction transaction) throws StorageException;
 
-    @NotNull Response<Boolean> addBalance(@NotNull final BigDecimal amount,
-                                          @NotNull final Transaction transaction);
+    boolean removeBalance(@NotNull final BigDecimal amount) throws StorageException;
 
-    @NotNull Response<Boolean> removeBalance(@NotNull final BigDecimal amount);
-
-    @NotNull Response<Boolean> removeBalance(@NotNull final BigDecimal amount,
-                                             @NotNull final Transaction transaction);
-
-    @NotNull Response<Boolean> getCreditworthy();
-
-    @NotNull Response<Boolean> setCreditworthy(final boolean creditworthy);
+    boolean removeBalance(@NotNull final BigDecimal amount, @NotNull final Transaction transaction) throws StorageException;
 
 }

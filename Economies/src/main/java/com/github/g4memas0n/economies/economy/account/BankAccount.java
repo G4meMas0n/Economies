@@ -1,9 +1,11 @@
 package com.github.g4memas0n.economies.economy.account;
 
+import com.github.g4memas0n.economies.economy.Response;
 import com.github.g4memas0n.economies.storage.AccountStorage;
-import com.github.g4memas0n.economies.util.Response;
 import org.jetbrains.annotations.NotNull;
+import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 public class BankAccount extends BasicAccount {
@@ -14,27 +16,42 @@ public class BankAccount extends BasicAccount {
 
     @Override
     public @NotNull Future<Response<UUID>> getUniqueId() {
-        return Response.future(UUID.randomUUID());
+        return CompletableFuture.completedFuture(Response.of(UUID.randomUUID())); //TODO replace bank uuid
     }
 
     @Override
     public @NotNull Future<Response<String>> getName() {
-        return Response.future("Bank"); //TODO replace bank name
+        return CompletableFuture.completedFuture(Response.of("Bank")); //TODO replace bank name
     }
 
     @Override
     public @NotNull Future<Response<Boolean>> setName(@NotNull final String name) {
-        //TODO replace exception
-        return Response.future(false, new IllegalArgumentException("not possible"));
+        throw new UnsupportedOperationException("not possible on global bank account");
+    }
+
+    @Override
+    public @NotNull Future<Response<Boolean>> depositBalance(@NotNull final BigDecimal amount) {
+        throw new UnsupportedOperationException("not possible on global bank account");
+    }
+
+    @Override
+    public @NotNull Future<Response<Boolean>> transferBalance(@NotNull final Account account,
+                                                              @NotNull final BigDecimal amount) {
+        throw new UnsupportedOperationException("not possible on global bank account");
+    }
+
+    @Override
+    public @NotNull Future<Response<Boolean>> withdrawBalance(@NotNull final BigDecimal amount) {
+        throw new UnsupportedOperationException("not possible on global bank account");
     }
 
     @Override
     public @NotNull Future<Response<Boolean>> isCreditworthy() {
-        return Response.future(true);
+        return CompletableFuture.completedFuture(Response.of(true));
     }
 
     @Override
-    public @NotNull Future<Response<Boolean>> setCreditworthy(final boolean creditworthy) {
-        return Response.future(false);
+    public @NotNull Future<Response<Boolean>> isInfinite() {
+        return CompletableFuture.completedFuture(Response.FALSE); //TODO implement infinite check
     }
 }

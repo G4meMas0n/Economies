@@ -1,6 +1,6 @@
 package com.github.g4memas0n.economies.economy.account;
 
-import com.github.g4memas0n.economies.util.Response;
+import com.github.g4memas0n.economies.economy.Response;
 import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -171,25 +171,6 @@ public interface Account {
      * @see #isCreditworthy()
      */
     @NotNull Future<Void> isCreditworthy(@NotNull final Consumer<Response<Boolean>> consumer);
-
-    /**
-     * Requests a change of the creditworthy for this {@code Account}.
-     * The response contains whether the request was successful. Otherwise, it will contain the
-     * throwable of the failure. //TODO List throwable
-     * @param creditworthy whether this account is creditworthy or not.
-     * @return a {@link Future} containing the response of this action.
-     */
-    @NotNull Future<Response<Boolean>> setCreditworthy(final boolean creditworthy);
-
-    /**
-     * Requests a change of the creditworthy for this {@code Account}.
-     * @param creditworthy whether this account is creditworthy or not.
-     * @param consumer a {@link Consumer} accepting the response of this action.
-     * @return a {@link Future} that completes when the consumer completes.
-     * @see #setCreditworthy(boolean)
-     */
-    @NotNull Future<Void> setCreditworthy(final boolean creditworthy,
-                                          @NotNull final Consumer<Response<Boolean>> consumer);
 
     /**
      * Requests an infinity check for this {@code Account}.
