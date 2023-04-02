@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 public final class Response<T> {
 
     public final static Response<Boolean> FALSE = Response.of(false);
+    public final static Response<Boolean> TRUE = Response.of(true);
 
     private final T result;
     private final Throwable failure;
@@ -50,5 +51,13 @@ public final class Response<T> {
         }
 
         return this.result;
+    }
+
+    public @NotNull T getOrThrow() throws Exception {
+        if (this.failure != null) {
+            throw (Exception) this.failure;
+        }
+
+        return getResult();
     }
 }

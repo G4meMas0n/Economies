@@ -8,22 +8,20 @@ public interface AccountStorage {
 
     @NotNull UUID getUniqueId() throws StorageException;
 
+    void setUniqueId(@NotNull UUID uniqueId) throws StorageException;
+
     @NotNull String getName() throws StorageException;
 
-    boolean setName(@NotNull final String name) throws StorageException;
+    void setName(@NotNull String name) throws StorageException;
 
     @NotNull BigDecimal getBalance() throws StorageException;
 
-    boolean setBalance(@NotNull final BigDecimal balance) throws StorageException;
+    void setBalance(@NotNull BigDecimal balance) throws StorageException;
 
-    boolean setBalance(@NotNull final BigDecimal balance, @NotNull final Transaction transaction)  throws StorageException;
+    void depositBalance(@NotNull BigDecimal amount, boolean negative) throws StorageException;
 
-    boolean addBalance(@NotNull final BigDecimal amount) throws StorageException;
+    void withdrawBalance(@NotNull BigDecimal amount, boolean negative) throws StorageException;
 
-    boolean addBalance(@NotNull final BigDecimal amount, @NotNull final Transaction transaction) throws StorageException;
-
-    boolean removeBalance(@NotNull final BigDecimal amount) throws StorageException;
-
-    boolean removeBalance(@NotNull final BigDecimal amount, @NotNull final Transaction transaction) throws StorageException;
+    void transferBalance(@NotNull AccountStorage account, @NotNull BigDecimal amount, boolean negative) throws StorageException;
 
 }

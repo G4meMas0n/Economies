@@ -1,8 +1,11 @@
 package com.github.g4memas0n.economies.economy.account;
 
+import com.github.g4memas0n.economies.economy.EconomyException;
+import com.github.g4memas0n.economies.economy.NotEnoughMoneyException;
 import com.github.g4memas0n.economies.economy.Response;
 import com.github.g4memas0n.economies.storage.AccountStorage;
 import com.github.g4memas0n.economies.storage.StorageException;
+import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -56,7 +59,9 @@ public abstract class BasicAccount implements Account {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return Response.of(this.storage.setName(name));
+                this.storage.setName(name);
+
+                return Response.of(true);
             } catch (StorageException ex) {
                 return Response.of(false, ex);
             }
@@ -89,8 +94,7 @@ public abstract class BasicAccount implements Account {
     public @NotNull Future<Response<Boolean>> hasBalance(@NotNull final BigDecimal amount) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                final BigDecimal balance = this.storage.getBalance();
-                return Response.of(balance.compareTo(amount) >= 0);
+                return Response.of(this.storage.getBalance().compareTo(amount) >= 0);
             } catch (StorageException ex) {
                 return Response.of(false, ex);
             }
@@ -104,15 +108,79 @@ public abstract class BasicAccount implements Account {
     }
 
     @Override
+    public @NotNull Future<Response<Boolean>> setBalance(@NotNull final BigDecimal balance) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                this.storage.setBalance(balance);
+                return Response.of(true);
+            } catch (StorageException ex) {
+                return Response.of(false, ex);
+            }
+        });
+    }
+
+    @Override
+    public @NotNull Future<Void> setBalance(@NotNull final BigDecimal balance,
+                                            @NotNull final Consumer<Response<Boolean>> consumer) {
+        return cast(setBalance(balance)).thenAccept(consumer);
+    }
+
+    @Override
+    public @NotNull Future<Response<Boolean>> depositBalance(@NotNull final BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("amount must be greater than zero");
+        }
+
+        return cast(BankAccount.get().isCreditworthy()).thenApplyAsync(creditworthy -> {
+            try {
+                // check if the bank can overdraft its balance
+                if (creditworthy.isFailure() || !creditworthy.getResult()) {
+                    BigDecimal balance = BankAccount.get().storage.getBalance().subtract(amount);
+
+                    if (balance.compareTo(BigDecimal.ZERO) < 0) {
+                        // throw exception as the bank would overdraft its balance
+                        throw new NotEnoughMoneyException(balance.negate());
+                    }
+                }
+
+                this.storage.depositBalance(amount, creditworthy.getResult());
+                return Response.of(true);
+            } catch (EconomyException | StorageException ex) {
+                return Response.of(false, ex);
+            }
+        });
+    }
+
+    @Override
     public @NotNull Future<Void> depositBalance(@NotNull final BigDecimal amount,
                                                 @NotNull final Consumer<Response<Boolean>> consumer) {
         return cast(depositBalance(amount)).thenAccept(consumer);
     }
 
     @Override
-    public @NotNull Future<Void> transferBalance(@NotNull final Account account, @NotNull final BigDecimal amount,
-                                                 @NotNull final Consumer<Response<Boolean>> consumer) {
-        return cast(transferBalance(account, amount)).thenAccept(consumer);
+    public @NotNull Future<Response<Boolean>> withdrawBalance(@NotNull final BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("amount must be greater than zero");
+        }
+
+        return cast(BankAccount.get().isCreditworthy()).thenApplyAsync(creditworthy -> {
+            try {
+                // check if the account can overdraft its balance
+                if (creditworthy.isFailure() || !creditworthy.getResult()) {
+                    BigDecimal balance = this.storage.getBalance().subtract(amount);
+
+                    if (balance.compareTo(BigDecimal.ZERO) < 0) {
+                        // throw exception as the new balance is negative
+                        throw new NotEnoughMoneyException(balance.negate());
+                    }
+                }
+
+                this.storage.withdrawBalance(amount, creditworthy.getResult());
+                return Response.of(true);
+            } catch (EconomyException | StorageException ex) {
+                return Response.of(false, ex);
+            }
+        });
     }
 
     @Override
@@ -122,13 +190,43 @@ public abstract class BasicAccount implements Account {
     }
 
     @Override
-    public @NotNull Future<Void> isCreditworthy(@NotNull final Consumer<Response<Boolean>> consumer) {
-        return cast(isCreditworthy()).thenAccept(consumer);
+    public @NotNull Future<Response<Boolean>> transferBalance(@NotNull final Account account, @NotNull final BigDecimal amount) {
+        Preconditions.checkArgument(account instanceof BasicAccount, "unknown account implementation");
+        Preconditions.checkState(account != this, "account must be another account as itself");
+
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("amount must be greater than zero");
+        }
+
+        return cast(isCreditworthy()).thenApplyAsync(creditworthy -> {
+            try {
+                // check if the account can overdraft its balance
+                if (creditworthy.isFailure() || !creditworthy.getResult()) {
+                    BigDecimal balance = this.storage.getBalance().subtract(amount);
+
+                    if (balance.compareTo(BigDecimal.ZERO) < 0) {
+                        // throw exception as the new balance is negative
+                        throw new NotEnoughMoneyException(balance.negate());
+                    }
+                }
+
+                this.storage.transferBalance(((BasicAccount) account).storage, amount, creditworthy.getResult());
+                return Response.of(true);
+            } catch (EconomyException | StorageException ex) {
+                return Response.of(false, ex);
+            }
+        });
     }
 
     @Override
-    public @NotNull Future<Void> isInfinite(@NotNull final Consumer<Response<Boolean>> consumer) {
-        return cast(isInfinite()).thenAccept(consumer);
+    public @NotNull Future<Void> transferBalance(@NotNull final Account account, @NotNull final BigDecimal amount,
+                                                 @NotNull final Consumer<Response<Boolean>> consumer) {
+        return cast(transferBalance(account, amount)).thenAccept(consumer);
+    }
+
+    @Override
+    public @NotNull Future<Void> isCreditworthy(@NotNull final Consumer<Response<Boolean>> consumer) {
+        return cast(isCreditworthy()).thenAccept(consumer);
     }
 
     //TODO Find other solution

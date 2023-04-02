@@ -2,33 +2,27 @@
 #     Economies - Plugin Configuration File      #
 ##################################################
 
-# Sets various balance options for bank accounts.
+# Sets various balance options for bank accounts:
 balance:
 
-  # Sets the initial amount of a bank account: (Type: Long, Default: 1000)
-  # Note: The value must be greater than or equal to zero. Otherwise, the default value will be used.
+  # Sets the initial balance for a bank account: (Type: Long, Default: 1000)
+  # Note: Must be greater than or equal to zero, otherwise the default value will be used.
   initial: 1000
 
-  # Sets the minimum amount of a back account: (Type: Long, Default: 0)
-  # Note: To disable overdrafts/loans completely set the value to: 'minimum: 0'
-  # Note: The value must be smaller than or equal to zero. Otherwise, the default value will be used.
-  minimum: 0
+  # Sets whether overdrafts/loans are enabled: (Type: Boolean, Default: true)
+  # Note: Player must have the permission (economies.creditworthy) to overdraft their account.
+  overdrafts: true
 
-  # Sets the maximum amount of a back account: (Type: Long, Default: -1)
-  # Note: To disable the maximum amount set the value to: 'minimum: -1'
-  # Note: The value must be greater than zero or negative one. Otherwise, the default value will be used.
-  maximum: -1
-
-# Sets various options for the global bank account.
+# Sets various options for the bank:
 bank:
 
-  # Sets whether the balance of global bank account is infinite: (Type: Boolean, Default: true)
-  # Note: When disabled, the money in circulation will always be the amount specified by 'bank.initial'.
-  infinite: true
+  # Sets the global balance for the bank: (Type: Long, Default: 1000000000)
+  # Note: Must be greater than zero, otherwise the default value will be used.
+  global: 1000000000
 
-  # Sets the initial balance for the global bank account: (Type: Long, Default: 1000000000)
-  # Note: The value must be greater than zero. If it is not greater than zero, the default value will be used.
-  initial: 1000000000
+  # Sets whether the balance of the bank is infinite: (Type: Boolean, Default: true)
+  # Note: When disabled, the money in circulation will always be the amount specified by 'bank.global'.
+  infinite: true
 
   # Sets the name of the global bank account: (Type: String, Default: "Bank")
   name: "Bank"

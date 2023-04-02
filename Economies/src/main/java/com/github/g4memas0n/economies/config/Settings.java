@@ -22,8 +22,9 @@ public final class Settings {
     private final Configuration config;
 
     private BigDecimal initial;
-    private BigDecimal minimum;
-    private BigDecimal maximum;
+
+    private boolean overdrafts;
+    private boolean infinite;
 
     private boolean debug;
 
@@ -43,12 +44,13 @@ public final class Settings {
                 this.config.setDefaults(this.defaults);
             }
         } catch (InvalidConfigurationException | IOException ex) {
-            Economies.warning("Unable to load default configuration '" + this.config.getFilename() + "': " + ex.getMessage());
+            Economies.warn("Could not load configuration %s: %s", this.config.getFilename(), ex.getMessage());
         }
 
         this.initial = loadInitialBalance();
-        this.minimum = loadMinimumBalance();
-        this.maximum = loadMaximumBalance();
+
+        this.overdrafts = loadOverdraftEnabled();
+        this.infinite = loadBankInfinite();
 
         this.debug = loadDebug();
     }
@@ -60,11 +62,15 @@ public final class Settings {
     }
 
 
+    /*
+     * Balance settings:
+     */
+
     private @NotNull BigDecimal loadInitialBalance() {
         long amount = this.config.getLong("balance.initial");
 
         if (amount < 0) {
-            Economies.warning("Found invalid initial balance: Value must be greater than or equal to zero");
+            Economies.warn("Could not load initial balance in %s: illegal value", this.config.getFilename());
             amount = this.defaults.getLong("balance.initial");
         }
 
@@ -75,39 +81,46 @@ public final class Settings {
         return this.initial;
     }
 
-    private @NotNull BigDecimal loadMinimumBalance() {
-        long amount = this.config.getLong("balance.minimum");
+    private boolean loadOverdraftEnabled() {
+        return this.config.getBoolean("balance.overdrafts", true);
+    }
 
-        if (amount > 0) {
-            Economies.warning("Found invalid minimum balance: Value must be smaller than or equal to zero");
-            amount = this.defaults.getLong("balance.minimum");
+    public boolean isOverdraftEnabled() {
+        return this.overdrafts;
+    }
+
+    /*
+     * Bank settings:
+     */
+
+    private boolean loadBankInfinite() {
+        return this.config.getBoolean("bank.infinite", true);
+    }
+
+    public boolean isBankInfinite() {
+        return this.infinite;
+    }
+
+    public @NotNull BigDecimal loadGlobalBalance() {
+        long amount = this.config.getLong("bank.global");
+
+        if (amount < 0) {
+            Economies.warn("Could not load global balance in %s: illegal value", this.config.getFilename());
+            amount = this.defaults.getLong("bank.global");
         }
 
         return BigDecimal.valueOf(amount);
     }
 
-    public @NotNull BigDecimal getMinimumBalance() {
-        return this.minimum;
+    public @NotNull BigDecimal getGlobalBalance() {
+        return loadGlobalBalance();
     }
 
-    public boolean hasMinimumBalance() {
-        return this.minimum.compareTo(BigDecimal.ZERO) < 0;
-    }
 
-    private @NotNull BigDecimal loadMaximumBalance() {
-        long amount = this.config.getLong("balance.maximum");
 
-        if (amount <= 0 && amount != -1) {
-            Economies.warning("Found invalid maximum balance: Value must be greater than zero or negative one");
-            amount = this.defaults.getLong("balance.maximum");
-        }
-
-        return BigDecimal.valueOf(amount);
-    }
-
-    public @NotNull BigDecimal getMaximumBalance() {
-        return this.maximum;
-    }
+    /*
+     *
+     */
 
     private boolean loadDebug() {
         return this.config.getBoolean("debug");

@@ -1,10 +1,13 @@
 package com.github.g4memas0n.economies;
 
 import com.github.g4memas0n.economies.config.Settings;
+import com.github.g4memas0n.economies.economy.account.AccountManager;
 import com.github.g4memas0n.economies.storage.StorageManager;
 import com.google.common.base.Preconditions;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import java.util.logging.Level;
 
 /**
  * The Economies main class.
@@ -16,13 +19,14 @@ public final class Economies extends JavaPlugin {
 
     private static Economies instance;
 
+    private AccountManager accounts;
     private StorageManager storage;
     private Settings settings;
 
     private boolean enabled;
 
-    public @NotNull StorageManager getStorage() {
-        return this.storage;
+    public @NotNull AccountManager getAccounts() {
+        return this.accounts;
     }
 
     public @NotNull Settings getSettings() {
@@ -85,21 +89,26 @@ public final class Economies extends JavaPlugin {
 
 
 
-    public static void debug(@NotNull final String message) {
+
+    public static void debug(@NotNull final String message, @Nullable final Object... parameters) {
         Preconditions.checkNotNull(instance);
 
         if (instance.getSettings().isDebug()) {
-            instance.getLogger().info(message);
+            instance.getLogger().info(String.format(message, parameters));
         }
     }
 
-    public static void info(@NotNull final String message) {
-        Preconditions.checkNotNull(instance);
-        instance.getLogger().info(message);
+    public static void info(@NotNull final String message, @Nullable final Object... parameters) {
+        log(Level.INFO, message, parameters);
     }
 
-    public static void warning(@NotNull final String message) {
+    public static void warn(@NotNull final String message, @Nullable final Object... parameters) {
+        log(Level.WARNING, message, parameters);
+    }
+
+    public static void log(@NotNull final Level level, @NotNull final String message,
+                           @Nullable final Object... parameters) {
         Preconditions.checkNotNull(instance);
-        instance.getLogger().warning(message);
+        instance.getLogger().log(level, String.format(message, parameters));
     }
 }

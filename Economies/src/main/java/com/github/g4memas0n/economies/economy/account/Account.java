@@ -23,7 +23,7 @@ public interface Account {
      * @return a {@link Future} that completes when the consumer completes.
      * @see #getUniqueId()
      */
-    @NotNull Future<Void> getUniqueId(@NotNull final Consumer<Response<UUID>> consumer);
+    @NotNull Future<Void> getUniqueId(@NotNull Consumer<Response<UUID>> consumer);
 
     /**
      * Requests the name of this {@code Account}.
@@ -39,7 +39,7 @@ public interface Account {
      * @return a {@link Future} that completes when the consumer completes.
      * @see #getName()
      */
-    @NotNull Future<Void> getName(@NotNull final Consumer<Response<String>> consumer);
+    @NotNull Future<Void> getName(@NotNull Consumer<Response<String>> consumer);
 
     /**
      * Request the change of the name for this {@code Account}.
@@ -48,7 +48,7 @@ public interface Account {
      * @param name the new name for this {@code Account}.
      * @return a {@link Future} containing the response of this action.
      */
-    @NotNull Future<Response<Boolean>> setName(@NotNull final String name);
+    @NotNull Future<Response<Boolean>> setName(@NotNull String name);
 
     /**
      * Request the change of the name for this {@code Account}.
@@ -57,7 +57,7 @@ public interface Account {
      * @return a {@link Future} that completes when the consumer completes.
      * @see #setName(String)
      */
-    @NotNull Future<Void> setName(@NotNull final String name, @NotNull final Consumer<Response<Boolean>> consumer);
+    @NotNull Future<Void> setName(@NotNull String name, @NotNull Consumer<Response<Boolean>> consumer);
 
     /**
      * Requests the current balance of this {@code Account}.
@@ -73,7 +73,7 @@ public interface Account {
      * @return a {@link Future} that completes when the consumer completes.
      * @see #getBalance()
      */
-    @NotNull Future<Void> getBalance(@NotNull final Consumer<Response<BigDecimal>> consumer);
+    @NotNull Future<Void> getBalance(@NotNull Consumer<Response<BigDecimal>> consumer);
 
     /**
      * Requests a balance check for this {@code Account}
@@ -83,7 +83,7 @@ public interface Account {
      * @param amount the amount that the balance must meet or exceed.
      * @return a {@link Future} containing the response for this check.
      */
-    @NotNull Future<Response<Boolean>> hasBalance(@NotNull final BigDecimal amount);
+    @NotNull Future<Response<Boolean>> hasBalance(@NotNull BigDecimal amount);
 
     /**
      * Requests a balance check for this {@code Account}
@@ -92,8 +92,25 @@ public interface Account {
      * @return a {@link Future} that completes when the consumer completes.
      * @see #hasBalance(BigDecimal)
      */
-    @NotNull Future<Void> hasBalance(@NotNull final BigDecimal amount,
-                                     @NotNull final Consumer<Response<Boolean>> consumer);
+    @NotNull Future<Void> hasBalance(@NotNull BigDecimal amount, @NotNull Consumer<Response<Boolean>> consumer);
+
+    /**
+     * Requests setting the specified balance for this {@code Account}.
+     * The response contains whether the request was successful. Otherwise, it will contain the
+     * throwable of the failure. //TODO List throwable
+     * @param balance the new balance for this {@code Account}.
+     * @return a {@link Future} containing the response of this action.
+     */
+    @NotNull Future<Response<Boolean>> setBalance(@NotNull BigDecimal balance);
+
+    /**
+     * Requests setting the specified balance for this {@code Account}.
+     * @param balance the new balance for this {@code Account}.
+     * @param consumer a {@link Consumer} accepting the response of this action.
+     * @return a {@link Future} that completes when the consumer completes.
+     * @see #setBalance(BigDecimal)
+     */
+    @NotNull Future<Void> setBalance(@NotNull BigDecimal balance, @NotNull Consumer<Response<Boolean>> consumer);
 
     /**
      * Requests a deposit of the specified amount onto this {@code Account}.
@@ -102,7 +119,7 @@ public interface Account {
      * @param amount the amount that should be deposited.
      * @return a {@link Future} containing the response of this action.
      */
-    @NotNull Future<Response<Boolean>> depositBalance(@NotNull final BigDecimal amount);
+    @NotNull Future<Response<Boolean>> depositBalance(@NotNull BigDecimal amount);
 
     /**
      * Requests a deposit of the specified amount onto this {@code Account}.
@@ -111,8 +128,25 @@ public interface Account {
      * @return a {@link Future} that completes when the consumer completes.
      * @see #depositBalance(BigDecimal)
      */
-    @NotNull Future<Void> depositBalance(@NotNull final BigDecimal amount,
-                                         @NotNull final Consumer<Response<Boolean>> consumer);
+    @NotNull Future<Void> depositBalance(@NotNull BigDecimal amount, @NotNull Consumer<Response<Boolean>> consumer);
+
+    /**
+     * Requests a withdrawal of the specified amount from this {@code Account}.
+     * The response contains whether the request was successful. Otherwise, it will contain the
+     * throwable of the failure. //TODO List throwable
+     * @param amount the amount that should be withdrawn.
+     * @return a {@link Future} containing the result of this withdrawal.
+     */
+    @NotNull Future<Response<Boolean>> withdrawBalance(@NotNull BigDecimal amount);
+
+    /**
+     * Requests a withdrawal of the specified amount from this {@code Account}.
+     * @param amount the amount that should be withdrawn.
+     * @param consumer a {@link Consumer} accepting the response of this action.
+     * @return a {@link Future} that completes when the consumer completes.
+     * @see #withdrawBalance(BigDecimal)
+     */
+    @NotNull Future<Void> withdrawBalance(@NotNull BigDecimal amount, @NotNull Consumer<Response<Boolean>> consumer);
 
     /**
      * Requests a transfer of the specified amount from this {@code Account} onto the specified {@code Account}.
@@ -122,8 +156,7 @@ public interface Account {
      * @param amount the amount that should be transferred.
      * @return a {@link Future} containing the result of this transfer.
      */
-    @NotNull Future<Response<Boolean>> transferBalance(@NotNull final Account account,
-                                                       @NotNull final BigDecimal amount);
+    @NotNull Future<Response<Boolean>> transferBalance(@NotNull Account account, @NotNull BigDecimal amount);
 
     /**
      * Requests a transfer of the specified amount from this {@code Account} onto the specified {@code Account}.
@@ -133,27 +166,8 @@ public interface Account {
      * @return a {@link Future} that completes when the consumer completes.
      * @see #transferBalance(Account, BigDecimal)
      */
-    @NotNull Future<Void> transferBalance(@NotNull final Account account, @NotNull final BigDecimal amount,
-                                          @NotNull final Consumer<Response<Boolean>> consumer);
-
-    /**
-     * Requests a withdrawal of the specified amount from this {@code Account}.
-     * The response contains whether the request was successful. Otherwise, it will contain the
-     * throwable of the failure. //TODO List throwable
-     * @param amount the amount that should be withdrawn.
-     * @return a {@link Future} containing the result of this withdrawal.
-     */
-    @NotNull Future<Response<Boolean>> withdrawBalance(@NotNull final BigDecimal amount);
-
-    /**
-     * Requests a withdrawal of the specified amount from this {@code Account}.
-     * @param amount the amount that should be withdrawn.
-     * @param consumer a {@link Consumer} accepting the response of this action.
-     * @return a {@link Future} that completes when the consumer completes.
-     * @see #withdrawBalance(BigDecimal)
-     */
-    @NotNull Future<Void> withdrawBalance(@NotNull final BigDecimal amount,
-                                          @NotNull final Consumer<Response<Boolean>> consumer);
+    @NotNull Future<Void> transferBalance(@NotNull Account account, @NotNull BigDecimal amount,
+                                          @NotNull Consumer<Response<Boolean>> consumer);
 
     /**
      * Requests a check of the creditworthy for this {@code Account}.
@@ -170,23 +184,6 @@ public interface Account {
      * @return a {@link Future} that completes when the consumer completes.
      * @see #isCreditworthy()
      */
-    @NotNull Future<Void> isCreditworthy(@NotNull final Consumer<Response<Boolean>> consumer);
-
-    /**
-     * Requests an infinity check for this {@code Account}.
-     * The result of the response will be {@code true} if this {@code Account} has an infinite balance. Otherwise, it
-     * will be {@code false}. If the check fails, the response contains the throwable of the failure.
-     * //TODO List throwable
-     * @return a {@link Future} containing the response of this check.
-     */
-    @NotNull Future<Response<Boolean>> isInfinite();
-
-    /**
-     * Requests an infinity check for this {@code Account}.
-     * @param consumer a {@link Consumer} accepting the response of this check.
-     * @return a {@link Future} that completes when the consumer completes.
-     * @see #isInfinite()
-     */
-    @NotNull Future<Void> isInfinite(@NotNull final Consumer<Response<Boolean>> consumer);
+    @NotNull Future<Void> isCreditworthy(@NotNull Consumer<Response<Boolean>> consumer);
 
 }
