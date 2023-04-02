@@ -1,6 +1,5 @@
 package com.github.g4memas0n.economies.economy.account;
 
-import com.github.g4memas0n.economies.economy.Response;
 import com.github.g4memas0n.economies.storage.AccountStorage;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -19,32 +18,32 @@ public class PlayerAccount extends BasicAccount {
     }
 
     @Override
-    public @NotNull Future<Response<UUID>> getUniqueId() {
-        return CompletableFuture.completedFuture(Response.of(this.player.getUniqueId()));
+    public @NotNull Future<UUID> getUniqueId() {
+        return CompletableFuture.completedFuture(this.player.getUniqueId());
     }
 
     @Override
-    public @NotNull Future<Response<String>> getName() {
+    public @NotNull Future<String> getName() {
         final String name = this.player.getName();
 
-        return name != null ? CompletableFuture.completedFuture(Response.of(name)) : super.getName();
+        return name != null ? CompletableFuture.completedFuture(name) : super.getName();
     }
 
     @Override
-    public @NotNull Future<Response<Boolean>> setName(@NotNull final String name) {
+    public @NotNull Future<Void> setName(@NotNull final String name) {
         throw new UnsupportedOperationException("not possible on player bank account");
     }
 
     @Override
-    public @NotNull Future<Response<Boolean>> isCreditworthy() {
-        Response<Boolean> response;
+    public @NotNull Future<Boolean> isCreditworthy() {
+        boolean creditworthy;
 
         if (this.player.isOnline() && this.player.getPlayer() != null) {
-            response = Response.of(this.player.getPlayer().hasPermission("economies.creditworthy"));
+            creditworthy = this.player.getPlayer().hasPermission("economies.creditworthy");
         } else {
-            response = Response.FALSE;
+            creditworthy = false;
         }
 
-        return CompletableFuture.completedFuture(response);
+        return CompletableFuture.completedFuture(creditworthy);
     }
 }

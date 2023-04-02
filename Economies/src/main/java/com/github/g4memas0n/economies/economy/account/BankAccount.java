@@ -1,7 +1,6 @@
 package com.github.g4memas0n.economies.economy.account;
 
 import com.github.g4memas0n.economies.Economies;
-import com.github.g4memas0n.economies.economy.Response;
 import com.github.g4memas0n.economies.storage.AccountStorage;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
@@ -22,28 +21,28 @@ public class BankAccount extends BasicAccount {
     }
 
     @Override
-    public @NotNull Future<Response<Boolean>> setBalance(@NotNull final BigDecimal amount) {
+    public @NotNull Future<Void> setBalance(@NotNull final BigDecimal amount) {
         throw new UnsupportedOperationException("not possible on global bank account");
     }
 
     @Override
-    public @NotNull Future<Response<Boolean>> depositBalance(@NotNull final BigDecimal amount) {
+    public @NotNull Future<Void> depositBalance(@NotNull final BigDecimal amount) {
         throw new UnsupportedOperationException("not possible on global bank account");
     }
 
     @Override
-    public @NotNull Future<Response<Boolean>> withdrawBalance(@NotNull final BigDecimal amount) {
+    public @NotNull Future<Void> withdrawBalance(@NotNull final BigDecimal amount) {
         throw new UnsupportedOperationException("not possible on global bank account");
     }
 
     @Override
-    public @NotNull Future<Response<Boolean>> transferBalance(@NotNull final Account account, @NotNull final BigDecimal amount) {
+    public @NotNull Future<Void> transferBalance(@NotNull final Account account, @NotNull final BigDecimal amount) {
         throw new UnsupportedOperationException("not possible on global bank account");
     }
 
     @Override
-    public @NotNull Future<Response<Boolean>> isCreditworthy() {
-        return CompletableFuture.completedFuture(Response.of(this.plugin.getSettings().isBankInfinite()));
+    public @NotNull Future<Boolean> isCreditworthy() {
+        return CompletableFuture.completedFuture(this.plugin.getSettings().isBankInfinite());
     }
 
     public static @NotNull BankAccount get() {

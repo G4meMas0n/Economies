@@ -1,7 +1,7 @@
 package com.github.g4memas0n.economies.economy.account;
 
 import com.github.g4memas0n.economies.Economies;
-import com.github.g4memas0n.economies.economy.Response;
+import com.github.g4memas0n.economies.economy.EconomyException;
 import com.github.g4memas0n.economies.storage.AccountStorage;
 import com.github.g4memas0n.economies.storage.StorageException;
 import com.github.g4memas0n.economies.storage.StorageManager;
@@ -15,7 +15,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class AccountManager implements AccountProvider {
@@ -29,7 +28,7 @@ public class AccountManager implements AccountProvider {
     }
 
     @Override
-    public @NotNull Future<Response<Account>> getAccount(@NotNull final OfflinePlayer player) {
+    public @NotNull Future<Account> getAccount(@NotNull final OfflinePlayer player) {
         Preconditions.checkArgument(player.getUniqueId().version() == 4, "illegal offline uuid");
 
         return CompletableFuture.supplyAsync(() -> {
@@ -41,6 +40,7 @@ public class AccountManager implements AccountProvider {
 
                 return ref;
             });
+
             Account account = reference != null ? reference.get() : null;
 
             if (account == null) {
@@ -56,11 +56,11 @@ public class AccountManager implements AccountProvider {
                         storage = this.storage.getAccount(player.getUniqueId());
                     }
                 } catch (StorageException ex) {
-                    return Response.of(ex);
+                    throw new EconomyException("", ex);
                 }
 
                 if (storage == null) {
-                    return Response.of(new AccountNotFoundException(player));
+                    throw new AccountNotFoundException(player);
                 }
 
                 account = new PlayerAccount(storage, player);
@@ -70,42 +70,30 @@ public class AccountManager implements AccountProvider {
                 this.cache.put(player.getUniqueId(), reference);
             }
 
-            return Response.of(account);
+            return account;
         });
     }
 
     @Override
-    public @NotNull Future<Void> getAccount(@NotNull final OfflinePlayer player,
-                                            @NotNull final Consumer<Response<Account>> consumer) {
-        return cast(getAccount(player)).thenAccept(consumer);
-    }
-
-    @Override
-    public @NotNull Future<Response<Boolean>> hasAccount(@NotNull final OfflinePlayer player) {
+    public @NotNull Future<Boolean> hasAccount(@NotNull final OfflinePlayer player) {
         Preconditions.checkArgument(player.getUniqueId().version() == 4, "illegal offline uuid");
 
         return CompletableFuture.supplyAsync(() -> {
             try {
                 SoftReference<Account> reference = this.cache.get(player.getUniqueId());
                 if (reference != null && reference.get() != null) {
-                    return Response.TRUE;
+                    return true;
                 }
 
-                return Response.of(this.storage.hasAccount(player.getUniqueId()));
+                return this.storage.hasAccount(player.getUniqueId());
             } catch (StorageException ex) {
-                return Response.of(false, ex);
+                throw new EconomyException("", ex);
             }
         });
     }
 
     @Override
-    public @NotNull Future<Void> hasAccount(@NotNull final OfflinePlayer player,
-                                            @NotNull final Consumer<Response<Boolean>> consumer) {
-        return cast(hasAccount(player)).thenAccept(consumer);
-    }
-
-    @Override
-    public @NotNull Future<Response<Boolean>> createAccount(@NotNull final OfflinePlayer player) {
+    public @NotNull Future<Boolean> createAccount(@NotNull final OfflinePlayer player) {
         Preconditions.checkArgument(player.getUniqueId().version() == 4, "illegal offline uuid");
         final String name = player.getName();
 
@@ -115,21 +103,15 @@ public class AccountManager implements AccountProvider {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return Response.of(this.storage.createAccount(player.getUniqueId(), name));
+                return this.storage.createAccount(player.getUniqueId(), name);
             } catch (StorageException ex) {
-                return Response.of(false, ex);
+                throw new EconomyException("", ex);
             }
         });
     }
 
     @Override
-    public @NotNull Future<Void> createAccount(@NotNull final OfflinePlayer player,
-                                               @NotNull final Consumer<Response<Boolean>> consumer) {
-        return cast(createAccount(player)).thenAccept(consumer);
-    }
-
-    @Override
-    public @NotNull Future<Response<Boolean>> deleteAccount(@NotNull final OfflinePlayer player) {
+    public @NotNull Future<Boolean> deleteAccount(@NotNull final OfflinePlayer player) {
         Preconditions.checkArgument(player.getUniqueId().version() == 4, "illegal offline uuid");
 
         return CompletableFuture.supplyAsync(() -> {
@@ -139,17 +121,11 @@ public class AccountManager implements AccountProvider {
                     Economies.debug("Invalidated cached account for uuid: %s", player.getUniqueId());
                 }
 
-                return Response.of(this.storage.deleteAccount(player.getUniqueId()));
+                return this.storage.deleteAccount(player.getUniqueId());
             } catch (StorageException ex) {
-                return Response.of(false, ex);
+                throw new EconomyException("", ex);
             }
         });
-    }
-
-    @Override
-    public @NotNull Future<Void> deleteAccount(@NotNull final OfflinePlayer player,
-                                               @NotNull final Consumer<Response<Boolean>> consumer) {
-        return cast(deleteAccount(player)).thenAccept(consumer);
     }
 
     /*
@@ -195,14 +171,5 @@ public class AccountManager implements AccountProvider {
                 Economies.debug("Invalidated cached account for uuid: %s", player.getUniqueId());
             }
         });
-    }
-
-    /*
-     *
-     */
-
-    //TODO Find other solution
-    private static <T> @NotNull CompletableFuture<Response<T>> cast(@NotNull final Future<Response<T>> future) {
-        return (CompletableFuture<Response<T>>) future;
     }
 }

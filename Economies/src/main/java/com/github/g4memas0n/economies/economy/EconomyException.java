@@ -2,7 +2,7 @@ package com.github.g4memas0n.economies.economy;
 
 import org.jetbrains.annotations.NotNull;
 
-public class EconomyException extends Exception {
+public class EconomyException extends RuntimeException {
 
     public EconomyException() {
 
