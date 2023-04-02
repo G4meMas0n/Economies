@@ -5,27 +5,45 @@
 # Sets various balance options for bank accounts:
 balance:
 
-  # Sets the initial balance for a bank account: (Type: Long, Default: 1000)
-  # Note: Must be greater than or equal to zero, otherwise the default value will be used.
-  initial: 1000
+  # Sets the initial balance for a bank account: (type: number, default: 0)
+  # Constraint: Must be greater than or equal to zero, otherwise the default value will be used.
+  initial: 0
 
-  # Sets whether overdrafts/loans are enabled: (Type: Boolean, Default: true)
-  # Note: Player must have the permission (economies.creditworthy) to overdraft their account.
+  # Sets whether overdrafts/loans are enabled: (type: boolean, default: true)
+  # Note: Player must also have the permission 'economies.creditworthy' to overdraft their account.
   overdrafts: true
 
 # Sets various options for the bank:
 bank:
 
-  # Sets the global balance for the bank: (Type: Long, Default: 1000000000)
-  # Note: Must be greater than zero, otherwise the default value will be used.
-  global: 1000000000
+  # Sets the global balance for the bank: (type: number, default: 1000000000)
+  # Constraint: Must be greater than zero, otherwise the default value will be used.
+  balance: 1000000000
 
-  # Sets whether the balance of the bank is infinite: (Type: Boolean, Default: true)
-  # Note: When disabled, the money in circulation will always be the amount specified by 'bank.global'.
+  # Sets whether the balance of the bank is infinite: (type: boolean, default: true)
+  # Note: When disabled, the money in circulation will always be the amount specified by 'bank.balance'.
   infinite: true
 
-  # Sets the name of the global bank account: (Type: String, Default: "Bank")
-  name: "Bank"
+# Sets various options for the currency:
+currency:
 
-# Sets whether the plugin should log debug information's to the console: (Type: Boolean, Default: false)
+  # Sets the currency decimal format, excluding symbols: (type: string, default: "#,##0.00")
+  # Note: The majority of countries uses '#,##0.00' to display currencies.
+  format: "#,##0.00"
+
+  # Sets the locale for the currency decimal format: (type: string, default: "en-US")
+  # Note: This changes the decimal and grouping symbols, as some locales use ',' and '.' interchangeably.
+  # Example:
+  #  - for 1.234,50 use 'de-DE'
+  #  - for 1,234.50 use 'en-US'
+  locale: "en-US"
+
+  # Sets the currency symbol that appears before/after the amount: (type: string, default: '$')
+  symbol: '$'
+
+  # Sets whether the currency symbol should appear at the end of the amount: (type: boolean, default: false)
+  # Note: When disabled, the currency symbol will appear at the start of the amount.
+  suffix: false
+
+# Sets whether the plugin should log debug information's to the console: (type: boolean, default: false)
 debug: false

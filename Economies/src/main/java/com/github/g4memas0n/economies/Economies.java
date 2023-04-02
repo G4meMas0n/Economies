@@ -2,6 +2,7 @@ package com.github.g4memas0n.economies;
 
 import com.github.g4memas0n.economies.config.Settings;
 import com.github.g4memas0n.economies.economy.account.AccountManager;
+import com.github.g4memas0n.economies.economy.currency.PrimaryCurrency;
 import com.github.g4memas0n.economies.storage.StorageManager;
 import com.google.common.base.Preconditions;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -20,6 +21,8 @@ public final class Economies extends JavaPlugin {
     private static Economies instance;
 
     private AccountManager accounts;
+    private PrimaryCurrency currency;
+
     private StorageManager storage;
     private Settings settings;
 
@@ -27,6 +30,10 @@ public final class Economies extends JavaPlugin {
 
     public @NotNull AccountManager getAccounts() {
         return this.accounts;
+    }
+
+    public @NotNull PrimaryCurrency getCurrency() {
+        return this.currency;
     }
 
     public @NotNull Settings getSettings() {
