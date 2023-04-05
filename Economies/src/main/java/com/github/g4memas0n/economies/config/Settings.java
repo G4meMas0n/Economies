@@ -1,7 +1,9 @@
 package com.github.g4memas0n.economies.config;
 
 import com.github.g4memas0n.cores.bukkit.config.Configuration;
+import com.github.g4memas0n.cores.database.DatabaseManager.Placeholder;
 import com.github.g4memas0n.economies.Economies;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +15,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Properties;
 
 /**
  * The Settings class that represent the configuration file of this plugin.
@@ -183,6 +186,51 @@ public final class Settings {
 
     public boolean isCurrencySuffix() {
         return loadCurrencySuffix();
+    }
+
+    /*
+     * database settings:
+     */
+
+    private @NotNull String loadDatabaseType() {
+        String type = this.config.getString("database.type");
+
+        if (type == null || type.isBlank()) {
+            Economies.warn("Could not find database type in %s", this.config.getFilename());
+            type = this.defaults.getString("database.type");
+        }
+
+        return Objects.requireNonNull(type);
+    }
+
+    public @NotNull String getDatabaseType() {
+        return loadDatabaseType();
+    }
+
+    private @NotNull Properties loadDatabaseProperties() {
+        ConfigurationSection section = this.config.getConfigurationSection("database.properties");
+
+        if (section == null) {
+            Economies.warn("Could not find database properties in %s", this.config.getFilename());
+            section = Objects.requireNonNull(this.defaults.getConfigurationSection("database.properties"));
+        }
+
+        Properties properties = new Properties();
+        String value;
+
+        for (final Placeholder entry : Placeholder.values()) {
+            value = section.getString(entry.getKey());
+
+            if (value != null) {
+                properties.setProperty(entry.getKey(), value);
+            }
+        }
+
+        return properties;
+    }
+
+    public @NotNull Properties getDatabaseProperties() {
+        return loadDatabaseProperties();
     }
 
     /*

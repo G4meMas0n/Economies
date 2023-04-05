@@ -45,5 +45,33 @@ currency:
   # Note: When disabled, the currency symbol will appear at the start of the amount.
   suffix: false
 
+# Sets various options for the database storage:
+database:
+
+  # Sets the database type (MySQL, SQLite, etc...) of your local/remote database (type: string, default: "MySQL")
+  # Note: Currently only the 'MySQL' type is supported.
+  type: "MySQL"
+
+  # Sets various options for the database connection:
+  properties:
+
+    # Sets the server/host address to the local/remote database: (type: string, default: "127.0.0.1")
+    # Note: Change this value only, if the database is located on another server.
+    host: "127.0.0.1"
+
+    # Sets the port to the local/remote database: (type: number, default: 3306)
+    # Note: Change this value only, if the database is using a port other than the default port.
+    port: 3306
+
+    # Sets the database name of the local/remote database: (type: string)
+    database: ""
+
+    # Sets the username of the database user on the local/remote database: (type: string)
+    # Note: Please make sure you are not using the root user of the database, as it is not recommended.
+    username: ""
+
+    # Sets the password of the database user on the local/remote database: (type: string)
+    password: ""
+
 # Sets whether the plugin should log debug information's to the console: (type: boolean, default: false)
 debug: false

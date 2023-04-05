@@ -23,6 +23,12 @@
             <version>1c7c535531</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.G4meMas0n.Cores</groupId>
+            <artifactId>cores-database</artifactId>
+            <version>9e5f0f87d2</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

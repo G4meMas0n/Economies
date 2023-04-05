@@ -1,0 +1,7 @@
+[
+    {
+        "class": "com.mysql.cj.jdbc.Driver",
+        "url": "jdbc:mysql://{Host}:{Port}/{Database}",
+        "type": "MySQL"
+    }
+]
