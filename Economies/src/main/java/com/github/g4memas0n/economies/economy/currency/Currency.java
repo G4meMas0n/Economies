@@ -6,6 +6,12 @@ import java.math.BigDecimal;
 public interface Currency {
 
     /**
+     * Returns the currency symbol that will appear at the start or at the end of a formatted number string.
+     * @return the currency symbol of this currency.
+     */
+    @NotNull String getSymbol();
+
+    /**
      * Formats the given {@code number} into a human-readable representation.
      *
      * @param number the double number to format.
@@ -48,11 +54,5 @@ public interface Currency {
      * @throws IllegalArgumentException if the number could not be parsed.
      */
     @NotNull BigDecimal parse(@NotNull String number);
-
-    /**
-     * Returns the currency symbol that will appear at the start or at the end of a formatted number string.
-     * @return the currency symbol of this currency.
-     */
-    @NotNull String symbol();
 
 }
