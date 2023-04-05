@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -26,13 +25,10 @@ public final class Settings {
     private final YamlConfiguration defaults;
     private final Configuration config;
 
-    private DecimalFormat format;
     private BigDecimal initial;
-    private String symbol;
 
     private boolean overdraft;
     private boolean infinite;
-    private boolean suffix;
 
     private boolean debug;
 
@@ -59,19 +55,7 @@ public final class Settings {
         this.overdraft = loadOverdraftBalance();
         this.infinite = loadBankInfinite();
 
-        try {
-            this.format = new DecimalFormat(loadCurrencyFormat());
-        } catch (IllegalArgumentException ex) {
-            Economies.warn("Could not setup currency format in %s: %s", this.config.getFilename(), ex.getMessage());
-            this.format = new DecimalFormat(Objects.requireNonNull(this.defaults.getString("currency.format")));
-        }
 
-        this.format.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(loadCurrencyLocale()));
-        this.format.setMaximumFractionDigits(2);
-        this.format.setRoundingMode(RoundingMode.FLOOR);
-        this.format.setParseBigDecimal(true);
-        this.symbol = loadCurrencySymbol();
-        this.suffix = loadCurrencySuffix();
 
         this.debug = loadDebug();
     }
@@ -141,15 +125,26 @@ public final class Settings {
      * currency settings:
      */
 
-    private @NotNull String loadCurrencyFormat() {
-        String format = this.config.getString("currency.format");
+    private @NotNull DecimalFormat loadCurrencyFormat() {
+        String pattern = this.config.getString("currency.format");
+        DecimalFormat format = null;
 
-        if (format == null || format.isBlank()) {
+        if (pattern != null && !pattern.isBlank()) {
+            try {
+                format = new DecimalFormat(pattern);
+            } catch (IllegalArgumentException ex) {
+                Economies.warn("Could not setup currency format in %s: %s", this.config.getFilename(), ex.getMessage());
+            }
+        } else {
             Economies.warn("Could not find currency format in %s", this.config.getFilename());
-            format = this.defaults.getString("currency.format");
         }
 
-        return Objects.requireNonNull(format);
+        if (format == null) {
+            format = new DecimalFormat(Objects.requireNonNull(this.defaults.getString("currency.format")));
+        }
+
+        format.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(loadCurrencyLocale()));
+        return format;
     }
 
     private @NotNull Locale loadCurrencyLocale() {
@@ -164,7 +159,7 @@ public final class Settings {
     }
 
     public @NotNull DecimalFormat getCurrencyFormat() {
-        return this.format;
+        return loadCurrencyFormat();
     }
 
     private @NotNull String loadCurrencySymbol() {
@@ -179,7 +174,7 @@ public final class Settings {
     }
 
     public @NotNull String getCurrencySymbol() {
-        return this.symbol;
+        return loadCurrencySymbol();
     }
 
     private boolean loadCurrencySuffix() {
@@ -187,7 +182,7 @@ public final class Settings {
     }
 
     public boolean isCurrencySuffix() {
-        return this.suffix;
+        return loadCurrencySuffix();
     }
 
     /*
